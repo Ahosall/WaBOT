@@ -17,7 +17,7 @@ const Main = async () => {
     auth,
     version,
     printQRInTerminal: true,
-    browser: [`Ayee ${botVersion}`, "Powered By Ahos", botVersion],
+    browser: [`WABot ${botVersion}`, "Powered By Ahos", botVersion],
     logger: pino({ level: "silent" }),
   });
 
