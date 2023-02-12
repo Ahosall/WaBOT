@@ -1,6 +1,6 @@
 {
   "name": "whatsapp-handler",
-  "version": "2023.2",
+  "version": "2023.2.12",
   "description": "",
   "main": "src/main.ts",
   "scripts": {
