@@ -1,5 +1,5 @@
 import { Boom } from "@hapi/boom";
-import { ConnectionState, DisconnectReason } from "@adiwajshing/baileys";
+import { ConnectionState, DisconnectReason } from "@whiskeyssockets/baileys";
 import { unlinkSync, readdirSync } from "fs";
 import { join } from "path";
 

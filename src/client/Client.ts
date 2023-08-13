@@ -2,7 +2,7 @@ import { readdirSync } from "fs";
 import makeWASocket, {
   makeCacheableSignalKeyStore,
   WASocket,
-} from "@adiwajshing/baileys";
+} from "@whiskeysockets/baileys";
 
 type TCommands = {
   info: {

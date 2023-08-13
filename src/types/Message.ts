@@ -1,5 +1,5 @@
 import { User, TMsgSend, TUser } from "./User";
-import { WASocket, WAMessage, proto } from "@adiwajshing/baileys";
+import { WASocket, WAMessage, proto } from "@whiskeyssockets/baileys";
 import { Group } from "./Group";
 
 type TType =
