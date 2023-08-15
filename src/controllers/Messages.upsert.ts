@@ -1,4 +1,4 @@
-import { WASocket, WAProto, WAMessage, proto } from "@whiskeyssockets/baileys";
+import { WASocket, WAProto, WAMessage, proto } from "@whiskeysockets/baileys";
 import { Client } from "../client/Client";
 import { Event } from "../types/Event";
 import Message from "../types/Message";
@@ -18,6 +18,7 @@ export = class extends Event {
   }
 
   run = async ({ messages, type }: TMessageUpsert) => {
+
     const msg = messages[0];
     const from = msg.key.remoteJid;
 
@@ -26,11 +27,9 @@ export = class extends Event {
     const aliases = this.client.aliases;
     const prefix = this.client.prefix;
 
-    const notPermission =
-      // msg.key.fromMe ||
-      type != "notify" || from == "status@broadcast";
+    const notPermission = from == "status@broadcast" // || msg.key.fromMe;
 
-    if (notPermission) return;
+    if (notPermission) return console.log(messages[0].message, type);
 
     try {
       const message = new Message({ sock, msg });

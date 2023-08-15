@@ -1,4 +1,4 @@
-import { WASocket, AnyRegularMessageContent } from "@whiskeyssockets/baileys";
+import { WASocket, AnyRegularMessageContent } from "@whiskeysockets/baileys";
 
 export type TUser = {
   client?: WASocket;

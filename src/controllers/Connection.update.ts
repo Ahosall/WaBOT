@@ -1,5 +1,5 @@
 import { Boom } from "@hapi/boom";
-import { ConnectionState, DisconnectReason } from "@whiskeyssockets/baileys";
+import { ConnectionState, DisconnectReason } from "@whiskeysockets/baileys";
 import { unlinkSync, readdirSync } from "fs";
 import { join } from "path";
 
@@ -54,7 +54,6 @@ export = class extends Event {
         console.log(
           `Device Logged Out, deleting session files and stop process...`
         );
-        await sessionRemove();
         process.exit();
       } else if (statusCode === DisconnectReason.restartRequired) {
         console.log("Restart required, restarting...");
@@ -67,9 +66,12 @@ export = class extends Event {
         reset();
       }
     } else if (connection == "open") {
-      console.log(
-        `\nLogged on ${this.client.sock.user.name} (${this.client.sock.user.id}).\n`
-      );
+      if (this.client.sock.user.name == undefined) {
+        await this.client.sock.logout(); 
+        reset()
+      } else {
+        console.log(`\nLogged on ${this.client.sock.user.name} (${this.client.sock.user.id}).\n`);
+      }
     }
   };
 };

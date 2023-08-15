@@ -3,7 +3,7 @@ import {
   Browsers,
   fetchLatestBaileysVersion,
   useMultiFileAuthState,
-} from "@whiskeyssockets/baileys";
+} from "@whiskeysockets/baileys";
 import pino from "pino";
 
 require("dotenv").config();
