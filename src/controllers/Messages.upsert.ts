@@ -1,4 +1,4 @@
-import { WASocket, WAProto, WAMessage, proto } from "@whiskeysockets/baileys";
+import { WASocket, WAMessage } from "@whiskeysockets/baileys";
 import { Client } from "../client/Client";
 import { Event } from "../types/Event";
 import Message from "../types/Message";

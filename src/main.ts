@@ -1,6 +1,5 @@
 import { Client } from "./client/Client";
 import {
-  Browsers,
   fetchLatestBaileysVersion,
   useMultiFileAuthState,
 } from "@whiskeysockets/baileys";
