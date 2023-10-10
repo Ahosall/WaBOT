@@ -7,17 +7,19 @@ import pino from "pino";
 
 require("dotenv").config();
 
+const pkg = require("../package.json");
+
 const Main = async () => {
-  const botVersion = require("../package.json").version;
   const { version } = await fetchLatestBaileysVersion();
   const auth = await useMultiFileAuthState(process.cwd() + "/auth/");
+  const logger = pino({ level: "fatal" });
 
   const client = new Client({
     auth,
     version,
     printQRInTerminal: true,
-    browser: [`WABot ${botVersion}`, "Powered By Ahos", botVersion],
-    logger: pino({ level: "silent" }),
+    browser: [`WABot ${pkg.version}`, "Powered By Ahos", pkg.version],
+    logger,
   });
 
   client.start();
