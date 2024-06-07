@@ -11,6 +11,8 @@ export type Client = WASocket & {
 };
 
 const createInstance = async () => {
+  const projectVersion = require("../../package.json")["version"];
+
   const { version } = await fetchLatestBaileysVersion();
   const { saveCreds, state } = await useMultiFileAuthState(
     process.cwd() + "/auth/"
@@ -29,6 +31,7 @@ const createInstance = async () => {
       logger,
       version,
       printQRInTerminal: true,
+      browser: [`WABot ${projectVersion}`, "Powered By Ahos", projectVersion],
     }),
     prefix: ".",
   };
