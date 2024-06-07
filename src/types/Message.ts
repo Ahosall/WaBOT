@@ -1,4 +1,4 @@
-import { proto, WAMessage } from "@whiskeysockets/baileys";
+import { proto, AnyMessageContent, WAMessage } from "@whiskeysockets/baileys";
 import { Client } from "../utils/Instance";
 
 type TMessageDispatcherProps = {
@@ -7,7 +7,7 @@ type TMessageDispatcherProps = {
   // tempora;
 };
 
-type TMessageDataToSent = {};
+type TMessageDataToSent = string | AnyMessageContent;
 
 class MessageDispatcher {
   private props: TMessageDispatcherProps;
@@ -20,12 +20,22 @@ class MessageDispatcher {
     };
   }
 
-  reply(entry: TMessageDataToSent) {
+  send(entry: TMessageDataToSent) {
     const { sendMessage } = this.props.sock;
 
-    if (typeof entry === "string") {
-      // return sendMessage(this.props.from.remoteJid as string, {});
-    } else if (typeof entry === "object") {
+    try {
+      if (typeof entry === "string") {
+        return sendMessage(this.props.from.remoteJid as string, {
+          text: entry,
+        });
+      } else if (typeof entry === "object") {
+        return sendMessage(this.props.from.remoteJid as string, entry);
+      } else {
+        throw "Input type does not match with TMessageDataToSent";
+      }
+    } catch (err) {
+      console.error(err);
+      return null;
     }
   }
 
