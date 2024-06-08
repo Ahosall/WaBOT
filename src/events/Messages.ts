@@ -1,16 +1,10 @@
-import { MessageUpsertType, WAMessage } from "@whiskeysockets/baileys";
+import { BaileysEventMap } from "@whiskeysockets/baileys";
 
 import Events from "../types/Events";
-import MessageDispatcher from "../types/Message";
-
-export type TMessageUpsertProps = {
-  messages: WAMessage[];
-  type: MessageUpsertType;
-};
 
 const event: Events = {
   name: "messages.upsert",
-  run: async (client, recv: TMessageUpsertProps) => {
+  run: async (client, recv: BaileysEventMap["messages.upsert"]) => {
     const { messages, type } = recv;
 
     if (type !== "notify") return;
@@ -18,8 +12,7 @@ const event: Events = {
 
     messages.forEach(async (m) => {
       console.log(JSON.stringify(m, null, 2));
-      const message = new MessageDispatcher(client, m);
-      // console.log(JSON.stringify(message, null, 2));
+      // const message = new MessageDispatcher(client, m);
     });
   },
 };
