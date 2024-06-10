@@ -127,6 +127,39 @@ class MessageDispatcher {
   }
 
   /**
+   * Sends a message.
+   *
+   * @param entry - The message content to be sent, either as a string or an object of AnyMessageContent type.
+   * @returns The result of the sendMessage function call or null if an error occurs.
+   */
+  reply(entry: TMessageDataToSent) {
+    const { sendMessage } = this.props.sock;
+
+    try {
+      if (typeof entry === "string") {
+        return sendMessage(
+          this.props.from.remoteJid as string,
+          {
+            text: entry,
+          },
+          {
+            quoted: this.props.m,
+          }
+        );
+      } else if (typeof entry === "object") {
+        return sendMessage(this.props.from.remoteJid as string, entry, {
+          quoted: this.props.m,
+        });
+      } else {
+        throw "Input type does not match with TMessageDataToSent";
+      }
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }
+
+  /**
    * Retrieves temporary data.
    *
    * @returns The temporary data as a number.
