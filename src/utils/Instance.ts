@@ -7,46 +7,76 @@ import makeWASocket, {
 import pino from "pino";
 
 import { join } from "path";
-import Handlers from "./Handlers";
+import Events from "../types/Events";
+import { readdirSync } from "fs";
 
-export type Client = WASocket & {
+export type TClientCustomProps = {
   prefix: string;
 };
 
-const startInstance = async () => {
-  console.clear();
-  console.log("Initializing...\n");
+type TClientProps = {
+  sock?: WASocket;
+  prefix: string;
+};
+class Client {
+  private props: TClientProps;
 
-  const projectVersion = require("../../package.json")["version"];
+  constructor(prefix: string = ".") {
+    this.props = { prefix };
+  }
 
-  const { version } = await fetchLatestBaileysVersion();
-  const { saveCreds, state } = await useMultiFileAuthState(
-    join(__dirname, "../../auth/")
-  );
+  async start() {
+    console.clear();
+    console.log("Initializing...\n");
 
-  const logger = pino({ level: "silent" });
+    const projectVersion = require("../../package.json")["version"];
 
-  const auth = {
-    creds: state.creds,
-    keys: makeCacheableSignalKeyStore(state.keys, logger),
-  };
+    const { version } = await fetchLatestBaileysVersion();
+    const { saveCreds, state } = await useMultiFileAuthState(
+      join(__dirname, "../../auth/")
+    );
 
-  const sock: Client = {
-    ...makeWASocket({
+    const logger = pino({ level: "silent" });
+
+    const auth = {
+      creds: state.creds,
+      keys: makeCacheableSignalKeyStore(state.keys, logger),
+    };
+
+    const sock = makeWASocket({
       auth,
       logger,
       version,
       syncFullHistory: false,
       printQRInTerminal: true,
       browser: [`WABot ${projectVersion}`, "Powered By Ahos", projectVersion],
-    }),
-    prefix: ".",
-  };
+    });
 
-  // Save auth file
-  sock.ev.on("creds.update", saveCreds);
+    this.props.sock = sock;
 
-  return sock;
-};
+    // Save creds
+    sock?.ev.on("creds.update", saveCreds);
 
-export default startInstance;
+    this.loadEvents();
+  }
+
+  private loadEvents() {
+    const sock = this.props.sock;
+    const eventsPath = join(__dirname, "../events");
+
+    // Load events
+    readdirSync(eventsPath).forEach((file) => {
+      try {
+        const eventFilePath = join(eventsPath, file);
+        const eventProps: Events = require(eventFilePath);
+
+        sock?.ev.on(eventProps.name, (args) => eventProps.run(sock, args));
+        console.log(`  - ${eventProps.name}`);
+      } catch (err) {
+        console.log(`  - ${file} (Error)`);
+      }
+    });
+  }
+}
+
+export default Client;
