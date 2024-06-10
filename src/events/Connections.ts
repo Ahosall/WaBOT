@@ -57,11 +57,11 @@ const event: Events = {
           await sessionRemove();
           process.exit(0);
         case DisconnectReason.restartRequired:
-          console.log("Reboot required! Restarting...");
+          console.log("Restart required! Restarting...");
           await restart();
           break;
         case DisconnectReason.timedOut:
-          console.log("Connection Timed Out...");
+          console.log("Connection Timed Out... restarting....");
           await restart();
           break;
         default:
