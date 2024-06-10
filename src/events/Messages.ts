@@ -22,6 +22,8 @@ const event: Events = {
     if (messages.length === 0) return;
 
     for (const m of messages) {
+      if (!m.message) return;
+
       const message = new MessageDispatcher(client, m);
 
       if (message.from === "status@broadcast") return;

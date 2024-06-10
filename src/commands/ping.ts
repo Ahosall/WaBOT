@@ -7,7 +7,7 @@ const cmd: Command = {
     aliases: ["p"],
   },
   run: async (client, message, args) => {
-    message.send("Salve");
+    message.reply("Salve");
   },
 };
 
