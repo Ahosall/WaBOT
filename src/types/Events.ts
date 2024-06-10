@@ -1,5 +1,5 @@
 import { BaileysEventMap } from "@whiskeysockets/baileys";
-import { Client } from "../utils/Instance";
+import Client from "../utils/Instance";
 
 type Events = {
   name: keyof BaileysEventMap;

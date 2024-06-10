@@ -10,19 +10,12 @@ import { join } from "path";
 import Events from "../types/Events";
 import { readdirSync } from "fs";
 
-export type TClientCustomProps = {
-  prefix: string;
-};
-
-type TClientProps = {
-  sock?: WASocket;
-  prefix: string;
-};
 class Client {
-  private props: TClientProps;
+  prefix: string;
+  sock?: WASocket;
 
-  constructor(prefix: string = ".") {
-    this.props = { prefix };
+  constructor(prefix?: string) {
+    this.prefix = prefix || ".";
   }
 
   async start() {
@@ -52,7 +45,7 @@ class Client {
       browser: [`WABot ${projectVersion}`, "Powered By Ahos", projectVersion],
     });
 
-    this.props.sock = sock;
+    this.sock = sock;
 
     // Save creds
     sock?.ev.on("creds.update", saveCreds);
@@ -60,8 +53,13 @@ class Client {
     this.loadEvents();
   }
 
+  stop() {
+    this.sock?.ev.removeAllListeners("messages.upsert");
+    this.sock?.ev.removeAllListeners("connection.update");
+  }
+
   private loadEvents() {
-    const sock = this.props.sock;
+    const sock = this.sock;
     const eventsPath = join(__dirname, "../events");
 
     // Load events
@@ -69,9 +67,12 @@ class Client {
       try {
         const eventFilePath = join(eventsPath, file);
         const eventProps: Events = require(eventFilePath);
-
-        sock?.ev.on(eventProps.name, (args) => eventProps.run(sock, args));
-        console.log(`  - ${eventProps.name}`);
+        if (sock) {
+          sock.ev.on(eventProps.name, (args) => eventProps.run(this, args));
+          console.log(`  - ${eventProps.name}`);
+        } else {
+          console.log(`  - ${eventProps.name} (Sock offline)`);
+        }
       } catch (err) {
         console.log(`  - ${file} (Error)`);
       }
