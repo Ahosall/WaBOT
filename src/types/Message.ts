@@ -1,9 +1,15 @@
-import { proto, AnyMessageContent, WAMessage } from "@whiskeysockets/baileys";
-import { Client } from "../utils/Instance";
+import {
+  proto,
+  AnyMessageContent,
+  WAMessage,
+  WASocket,
+} from "@whiskeysockets/baileys";
+
+import Client from "../utils/Instance";
 
 type TMessageDispatcherProps = {
   m: WAMessage;
-  sock: Client;
+  sock: WASocket;
 
   type: keyof proto.IMessage;
   from: proto.IMessageKey;
@@ -24,9 +30,11 @@ class MessageDispatcher {
   constructor(client: Client, m: WAMessage) {
     this.props = {
       m,
-      sock: client,
+      sock: client.sock as WASocket,
       from: m.key,
-      type: this.getMessageType(),
+      type: Object.keys(
+        m.message as proto.IMessage
+      ).reverse()[0] as keyof proto.IMessage,
       temporary: this.getTemporaryData(),
     };
   }
@@ -65,8 +73,8 @@ class MessageDispatcher {
         this.props.media = msg.videoMessage;
 
         return msg.videoMessage?.caption;
-      // case "messageContextInfo" || "buttonsResponseMessage":
-      //   return msg.buttonsResponseMessage?.selectedButtonId;
+      default:
+        return null;
     }
   }
 
@@ -87,10 +95,6 @@ class MessageDispatcher {
       console.error(err);
       return null;
     }
-  }
-
-  private getMessageType() {
-    return Object.keys(this.props.m).reverse()[0] as keyof proto.IMessage;
   }
 
   private getTemporaryData() {
