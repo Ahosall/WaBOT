@@ -11,8 +11,8 @@ import Events from "../types/Events";
 import { readdirSync } from "fs";
 
 class Client {
-  prefix: string;
   sock?: WASocket;
+  prefix: string;
 
   constructor(prefix?: string) {
     this.prefix = prefix || ".";
@@ -57,6 +57,8 @@ class Client {
     this.sock?.ev.removeAllListeners("messages.upsert");
     this.sock?.ev.removeAllListeners("connection.update");
   }
+
+  private loadCmds() {}
 
   private loadEvents() {
     const sock = this.sock;
