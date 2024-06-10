@@ -6,6 +6,6 @@
     "removeComments": true,
     "strict": true,
     "noImplicitAny": true,
-    "skipLibCheck": false
+    "skipLibCheck": true // Baileys Errors
   }
 }
