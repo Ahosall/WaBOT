@@ -24,9 +24,18 @@ type TMessageDispatcherProps = {
 
 type TMessageDataToSent = string | AnyMessageContent;
 
+/**
+ * Class responsible for dispatching messages.
+ */
 class MessageDispatcher {
   private props: TMessageDispatcherProps;
 
+  /**
+   * Constructor for MessageDispatcher.
+   *
+   * @param client - The client instance.
+   * @param m - The WAMessage instance.
+   */
   constructor(client: Client, m: WAMessage) {
     this.props = {
       m,
@@ -39,6 +48,20 @@ class MessageDispatcher {
     };
   }
 
+  /**
+   * Gets the remoteJID of the message author.
+   *
+   * @return The remoteJID.
+   */
+  get from() {
+    return this.props.from.remoteJid;
+  }
+
+  /**
+   * Getter for the content of the message.
+   *
+   * @returns The content of the message.
+   */
   get content() {
     const msg = this.props.m.message as proto.IMessage;
 
@@ -78,6 +101,12 @@ class MessageDispatcher {
     }
   }
 
+  /**
+   * Sends a message.
+   *
+   * @param entry - The message content to be sent, either as a string or an object of AnyMessageContent type.
+   * @returns The result of the sendMessage function call or null if an error occurs.
+   */
   send(entry: TMessageDataToSent) {
     const { sendMessage } = this.props.sock;
 
@@ -97,6 +126,11 @@ class MessageDispatcher {
     }
   }
 
+  /**
+   * Retrieves temporary data.
+   *
+   * @returns The temporary data as a number.
+   */
   private getTemporaryData() {
     return 0;
   }

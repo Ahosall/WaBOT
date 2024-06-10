@@ -92,7 +92,7 @@ class Client {
     readdirSync(eventsPath).forEach((file) => {
       try {
         const eventFilePath = join(eventsPath, file);
-        const eventProps: Events = require(eventFilePath);
+        const eventProps: Events = require(eventFilePath).default;
         if (sock) {
           sock.ev.on(eventProps.name, (args) => eventProps.run(this, args));
           console.log(`  - ${eventProps.name}`);
@@ -100,7 +100,7 @@ class Client {
           console.log(`  - ${eventProps.name} (Sock offline)`);
         }
       } catch (err) {
-        console.log(`  - ${file} (Error)`);
+        console.log(`  - ${file} (${err})`);
       }
     });
   }

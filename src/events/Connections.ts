@@ -1,10 +1,12 @@
 import { Boom } from "@hapi/boom";
 import { BaileysEventMap, DisconnectReason } from "@whiskeysockets/baileys";
-
 import Events from "../types/Events";
 import { join } from "path";
 import { readdirSync, unlinkSync } from "fs";
 
+/**
+ * Removes session files.
+ */
 const sessionRemove = async () => {
   const filesAuth = join(__dirname, "../../auth/");
   readdirSync(filesAuth).forEach((file) => {
@@ -12,11 +14,24 @@ const sessionRemove = async () => {
   });
 };
 
+/**
+ * Event handler for the "connection.update" event.
+ */
 const event: Events = {
   name: "connection.update",
+
+  /**
+   * The function to be executed when the "connection.update" event is triggered.
+   *
+   * @param client - The client instance that interacts with the Baileys library.
+   * @param recv - The event data containing the connection status and the last disconnection details.
+   */
   run: async (client, recv: BaileysEventMap["connection.update"]) => {
     const { connection, lastDisconnect } = recv;
 
+    /**
+     * Restarts the client after a delay.
+     */
     const restart = async () => {
       await setTimeout(async () => {
         await client.stop();
@@ -24,7 +39,7 @@ const event: Events = {
       }, 5000);
     };
 
-    if (connection == "close" && lastDisconnect) {
+    if (connection === "close" && lastDisconnect) {
       const { statusCode } = (lastDisconnect.error as Boom)?.output;
 
       switch (statusCode) {
@@ -32,7 +47,6 @@ const event: Events = {
           try {
             console.log("Bad session file, run again...");
             client.sock?.logout();
-
             await sessionRemove();
           } catch (err) {
             process.exit(1);
@@ -52,7 +66,7 @@ const event: Events = {
           process.exit(1);
         case DisconnectReason.loggedOut:
           console.log(
-            "Device Logged Out, deleting session files and stop process..."
+            "Device Logged Out, deleting session files and stopping process..."
           );
           await sessionRemove();
           process.exit(0);
@@ -69,12 +83,11 @@ const event: Events = {
           await restart();
           break;
       }
-    } else if (connection == "open") {
+    } else if (connection === "open") {
       const user = client.sock?.user;
-
       console.log(`\nLogged on ${user?.name} (${user?.id}).\n`);
     }
   },
 };
 
-module.exports = event;
+export default event;
