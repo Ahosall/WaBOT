@@ -1,7 +1,7 @@
 {
   "name": "bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple structure of a bot for WhatsApp",
   "main": "dist",
   "scripts": {
     "build": "tsc --build",
@@ -10,13 +10,12 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^6.7.4",
+    "@hapi/boom": "10.0.1",
+    "@whiskeysockets/baileys": "6.7.4",
     "pino": "8.15.0",
-    "qrcode-terminal": "^0.12.0",
-    "yaml": "^2.4.3"
+    "qrcode-terminal": "0.12.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
