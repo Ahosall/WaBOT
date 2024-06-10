@@ -9,10 +9,13 @@ import pino from "pino";
 import { join } from "path";
 import Events from "../types/Events";
 import { readdirSync } from "fs";
+import Command from "../types/Commands";
 
 class Client {
   sock?: WASocket;
   prefix: string;
+  commands: Map<string, Command> = new Map();
+  aliases: Map<string, Command> = new Map();
 
   constructor(prefix?: string) {
     this.prefix = prefix || ".";
@@ -51,6 +54,7 @@ class Client {
     sock?.ev.on("creds.update", saveCreds);
 
     this.loadEvents();
+    this.loadCmds();
   }
 
   stop() {
@@ -58,7 +62,27 @@ class Client {
     this.sock?.ev.removeAllListeners("connection.update");
   }
 
-  private loadCmds() {}
+  private loadCmds() {
+    const commandsPath = join(__dirname, "../commands");
+
+    // Load commands
+    readdirSync(commandsPath).forEach((file) => {
+      try {
+        const commandFilePath = join(commandsPath, file);
+        const commandProps = require(commandFilePath) as Command;
+        const commandInfo = commandProps.info;
+
+        if (commandInfo.aliases)
+          commandInfo.aliases.forEach((alias) =>
+            this.aliases.set(alias, commandProps)
+          );
+
+        this.commands.set(commandInfo.name, commandProps);
+      } catch (err) {
+        console.log(`  - ${file} (Error)`);
+      }
+    });
+  }
 
   private loadEvents() {
     const sock = this.sock;
