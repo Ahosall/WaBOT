@@ -6,7 +6,11 @@ import {
 } from "@whiskeysockets/baileys";
 
 import Client from "../utils/Instance";
+import Group from "./Group";
 
+/**
+ * Type definition for message properties.
+ */
 type TMessageDispatcherProps = {
   m: WAMessage;
   sock: WASocket;
@@ -55,6 +59,21 @@ class MessageDispatcher {
    */
   get from() {
     return this.props.from.remoteJid;
+  }
+
+  /**
+   * Asynchronously fetches the group metadata and returns a Group instance.
+   *
+   * @returns A promise that resolves to a Group instance if successful, or undefined if there was an error.
+   */
+  get group() {
+    return this.props.sock
+      .groupMetadata(this.props.from.remoteJid as string)
+      .then((data) => new Group(data))
+      .catch((err) => {
+        console.error(err);
+        return undefined;
+      });
   }
 
   /**
