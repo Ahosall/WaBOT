@@ -7,6 +7,7 @@ import {
 
 import Client from "../utils/Instance";
 import Group from "./Group";
+import User from "./User";
 
 /**
  * Type definition for message properties.
@@ -74,6 +75,15 @@ class MessageDispatcher {
         console.error(err);
         return undefined;
       });
+  }
+
+  /**
+   * Gets the author of the message and returns a User instance.
+   *
+   * @returns An instance of the User class representing the author of the message.
+   */
+  get author() {
+    return new User(this.props.m);
   }
 
   /**
