@@ -44,21 +44,24 @@ const event: Events = {
 
       switch (statusCode) {
         case DisconnectReason.badSession:
-          try {
-            console.log("Bad session file, run again...");
-            client.sock?.logout();
-            await sessionRemove();
-          } catch (err) {
-            process.exit(1);
-          }
+          console.log("Bad session file, run again...");
+          await restart();
           break;
-        case DisconnectReason.connectionClosed:
-          console.log("Connection closed....");
-          process.exit(1);
         case DisconnectReason.connectionLost:
           console.log("Connection lost....");
           await restart();
           break;
+        case DisconnectReason.restartRequired:
+          console.log("Restart required! Restarting...");
+          await restart();
+          break;
+        case DisconnectReason.timedOut:
+          console.log("Connection Timed Out... restarting....");
+          await restart();
+          break;
+        case DisconnectReason.connectionClosed:
+          console.log("Connection closed....");
+          process.exit(1);
         case DisconnectReason.connectionReplaced:
           console.log(
             "There is one active instance, closing the current one..."
@@ -70,14 +73,6 @@ const event: Events = {
           );
           await sessionRemove();
           process.exit(0);
-        case DisconnectReason.restartRequired:
-          console.log("Restart required! Restarting...");
-          await restart();
-          break;
-        case DisconnectReason.timedOut:
-          console.log("Connection Timed Out... restarting....");
-          await restart();
-          break;
         default:
           console.log(lastDisconnect.error);
           await restart();
