@@ -26,8 +26,6 @@ const event: Events = {
 
       const message = new MessageDispatcher(client, m);
 
-      console.log(message.author);
-
       if (message.from === "status@broadcast") return;
       if (message.content === null) return;
       if (!message.content?.startsWith(client.prefix)) return;
