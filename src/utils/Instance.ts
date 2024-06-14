@@ -66,6 +66,7 @@ class Client {
     const commandsPath = join(__dirname, "../commands");
 
     // Load commands
+    console.log("\nCommands:");
     readdirSync(commandsPath).forEach((file) => {
       try {
         const commandFilePath = join(commandsPath, file);
@@ -89,6 +90,7 @@ class Client {
     const eventsPath = join(__dirname, "../events");
 
     // Load events
+    console.log("Events:");
     readdirSync(eventsPath).forEach((file) => {
       try {
         const eventFilePath = join(eventsPath, file);
