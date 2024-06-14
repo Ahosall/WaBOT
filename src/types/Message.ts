@@ -64,6 +64,7 @@ class MessageDispatcher {
    * @return The remoteJID.
    */
   get from() {
+    if (this.fromGroup) return this.props.from.participant;
     return this.props.from.remoteJid;
   }
 
