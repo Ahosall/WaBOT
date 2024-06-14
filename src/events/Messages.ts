@@ -24,7 +24,11 @@ const event: Events = {
     for (const m of messages) {
       if (!m.message) return;
 
-      const message = new MessageDispatcher(client, m);
+      const groupMetadata = m.key.remoteJid?.endsWith("@g.us")
+        ? await client.sock?.groupMetadata(m.key.remoteJid)
+        : undefined;
+
+      const message = new MessageDispatcher(client, m, groupMetadata);
 
       if (message.from === "status@broadcast") return;
       if (message.content === null) return;

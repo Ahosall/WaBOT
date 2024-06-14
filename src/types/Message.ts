@@ -3,6 +3,7 @@ import {
   AnyMessageContent,
   WAMessage,
   WASocket,
+  GroupMetadata,
 } from "@whiskeysockets/baileys";
 
 import Client from "../utils/Instance";
@@ -15,6 +16,7 @@ import User from "./User";
 type TMessageDispatcherProps = {
   m: WAMessage;
   sock: WASocket;
+  group: GroupMetadata | undefined;
 
   type: keyof proto.IMessage;
   from: proto.IMessageKey;
@@ -46,10 +48,11 @@ class MessageDispatcher {
    * @param client - The client instance.
    * @param m - The WAMessage instance.
    */
-  constructor(client: Client, m: WAMessage) {
+  constructor(client: Client, m: WAMessage, group?: GroupMetadata) {
     this.props = {
       m,
       sock: client.sock as WASocket,
+      group,
       from: m.key,
       type: Object.keys(
         m.message as proto.IMessage
@@ -64,33 +67,18 @@ class MessageDispatcher {
    * @return The remoteJID.
    */
   get from() {
-    if (this.fromGroup) return this.props.from.participant;
+    if (this.props.group) return this.props.from.participant;
     return this.props.from.remoteJid;
   }
 
   /**
-   * Gets whether the message was sent in a group or not.
+   * Returns data from a group
    *
-   * @return True if the message was sent in a group, false otherwise.
-   */
-  get fromGroup() {
-    const remoteJid = this.props.from.remoteJid as string;
-    return remoteJid.includes("@g.us");
-  }
-
-  /**
-   * Asynchronously fetches the group metadata and returns a Group instance.
-   *
-   * @returns A promise that resolves to a Group instance if successful, or undefined if there was an error.
+   * @returns Returns an object from a group, if there is a group, otherwise it returns undefined.
    */
   get group() {
-    return this.props.sock
-      .groupMetadata(this.props.from.remoteJid as string)
-      .then((data) => new Group(data))
-      .catch((err) => {
-        console.error(err);
-        return undefined;
-      });
+    if (this.props.group) return new Group(this.props.group);
+    return undefined;
   }
 
   /**
