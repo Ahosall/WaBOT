@@ -42,7 +42,7 @@ type Command = {
   run: (
     client: Client,
     message: MessageDispatcher,
-    args: string[]
+    args?: string[]
   ) => Promise<void | any>;
 };
 
