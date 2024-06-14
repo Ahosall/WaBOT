@@ -27,7 +27,12 @@ type TMessageDispatcherProps = {
   temporary?: number;
 };
 
-type TMessageDataToSent = string | AnyMessageContent;
+type CustomAnyMessageContent = {
+  text: string;
+  mentions: string[];
+} & AnyMessageContent;
+
+type TMessageDataToSent = string | CustomAnyMessageContent;
 
 /**
  * Class responsible for dispatching messages.
@@ -138,16 +143,33 @@ class MessageDispatcher {
    */
   send(entry: TMessageDataToSent) {
     const { sendMessage } = this.props.sock;
+    const remoteJid = this.props.from.remoteJid as string;
 
     try {
       if (typeof entry === "string") {
-        return sendMessage(this.props.from.remoteJid as string, {
-          text: entry,
-        });
+        const { cleanedText, mentions } = this.processMentions(entry);
+
+        const messageContent: AnyMessageContent = {
+          text: cleanedText,
+          ...(mentions.length > 0 && { mentions }),
+        };
+
+        return sendMessage(remoteJid, messageContent);
       } else if (typeof entry === "object") {
-        return sendMessage(this.props.from.remoteJid as string, entry);
+        const messageContent = { ...entry };
+
+        if (messageContent.text) {
+          const { cleanedText, mentions } = this.processMentions(
+            messageContent.text
+          );
+          messageContent.text = cleanedText;
+          messageContent.mentions =
+            mentions.length > 0 ? mentions : messageContent.mentions;
+        }
+
+        return sendMessage(remoteJid, messageContent);
       } else {
-        throw "Input type does not match with TMessageDataToSent";
+        throw new Error("Input type does not match with TMessageDataToSent");
       }
     } catch (err) {
       console.error(err);
@@ -156,31 +178,44 @@ class MessageDispatcher {
   }
 
   /**
-   * Sends a message.
+   * Replies to a message.
    *
    * @param entry - The message content to be sent, either as a string or an object of AnyMessageContent type.
    * @returns The result of the sendMessage function call or null if an error occurs.
    */
   reply(entry: TMessageDataToSent) {
     const { sendMessage } = this.props.sock;
+    const remoteJid = this.props.from.remoteJid as string;
 
     try {
       if (typeof entry === "string") {
-        return sendMessage(
-          this.props.from.remoteJid as string,
-          {
-            text: entry,
-          },
-          {
-            quoted: this.props.m,
-          }
-        );
+        const { cleanedText, mentions } = this.processMentions(entry);
+
+        const messageContent: AnyMessageContent = {
+          text: cleanedText,
+          ...(mentions.length > 0 && { mentions }),
+        };
+
+        return sendMessage(remoteJid, messageContent, {
+          quoted: this.props.m,
+        });
       } else if (typeof entry === "object") {
-        return sendMessage(this.props.from.remoteJid as string, entry, {
+        const messageContent = { ...entry };
+
+        if (messageContent.text) {
+          const { cleanedText, mentions } = this.processMentions(
+            messageContent.text
+          );
+          messageContent.text = cleanedText;
+          messageContent.mentions =
+            mentions.length > 0 ? mentions : messageContent.mentions;
+        }
+
+        return sendMessage(remoteJid, messageContent, {
           quoted: this.props.m,
         });
       } else {
-        throw "Input type does not match with TMessageDataToSent";
+        throw new Error("Input type does not match with TMessageDataToSent");
       }
     } catch (err) {
       console.error(err);
@@ -195,6 +230,28 @@ class MessageDispatcher {
    */
   private getTemporaryData() {
     return 0;
+  }
+
+  /**
+   * Processes mentions in a text string.
+   *
+   * @param text The text to process for mentions.
+   * @returns An array of mention strings formatted as `number@s.whatsapp.net`.
+   */
+  private processMentions(text: string) {
+    const mentionMatches = text.match(/@\d+@s\.whatsapp\.net|@\d+/g);
+    let cleanedText = text;
+    let mentions: string[] = [];
+
+    if (mentionMatches) {
+      mentions = mentionMatches.map((mention) => {
+        let number = mention.replace("@s.whatsapp.net", "");
+        cleanedText = cleanedText.replace(mention, number);
+        return `${number.replace("@", "")}@s.whatsapp.net`;
+      });
+    }
+
+    return { cleanedText, mentions };
   }
 }
 
