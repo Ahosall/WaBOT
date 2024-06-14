@@ -68,6 +68,16 @@ class MessageDispatcher {
   }
 
   /**
+   * Gets whether the message was sent in a group or not.
+   *
+   * @return True if the message was sent in a group, false otherwise.
+   */
+  get fromGroup() {
+    const remoteJid = this.props.from.remoteJid as string;
+    return remoteJid.includes("@g.us");
+  }
+
+  /**
    * Asynchronously fetches the group metadata and returns a Group instance.
    *
    * @returns A promise that resolves to a Group instance if successful, or undefined if there was an error.
